@@ -1,0 +1,90 @@
+# Cấu hình trung tâm cho đồ án Phân tích & Dự báo IL/LVR trên Uniswap v3
+project:
+  name: "il-lvr-analysis"
+  random_seed: 42
+  base_frequency: "1h"
+  timezone: "UTC"
+
+time_range:
+  # Bao phủ toàn bộ lịch sử hoạt động từ khi khởi tạo Uniswap v3 (05/2021) đến 02/2025
+  # để bao quát nhiều chu kỳ thị trường (Bull 2021, Bear 2022, Sideway 2023, Bull 2024, Correction 2025)
+  # và kiểm thử trực tiếp việc chuyển đổi đơn vị timestamp ms -> µs từ 2025-01-01 của Binance Vision
+  start_date: "2021-05-05"
+  end_date: "2025-02-28"
+
+binance:
+  base_url_monthly: "https://data.binance.vision/data/spot/monthly/klines"
+  base_url_daily: "https://data.binance.vision/data/spot/daily/klines"
+  verify_checksum: true
+  symbols:
+    - symbol: "ETHUSDT"
+      intervals: ["1h", "1m"]
+      purpose: "Giá CEX tham chiếu cho WETH, tính Realized Volatility và LVR"
+    - symbol: "USDCUSDT"
+      intervals: ["1h"]
+      purpose: "Theo dõi độ lệch chuẩn stablecoin (stablecoin deviation)"
+
+thegraph:
+  subgraph_id: "5zvR82QoaXYFyDEKLZ9t6v9adgnptxYpKpSbxtgVENFV"
+  gateway_base_url: "https://gateway.thegraph.com/api"
+  page_size: 1000
+  max_retries: 4
+  retry_backoff_sec: 2.0
+  # Nguồn dữ liệu mẫu xác thực từ repo ilyamk/uniswap-v3-lp-strategy-toolkit (mục 2.3 DATASET_PLAN.md)
+  toolkit_sample_urls:
+    pool_data: "https://raw.githubusercontent.com/ilyamk/uniswap-v3-lp-strategy-toolkit/main/wsteth_eth_data_0.01_pool_data.csv"
+    il_data: "https://raw.githubusercontent.com/ilyamk/uniswap-v3-lp-strategy-toolkit/main/wsteth_eth_data_0.01_impermanent_loss.csv"
+    ticks_data: "https://raw.githubusercontent.com/ilyamk/uniswap-v3-lp-strategy-toolkit/main/wsteth_eth_data_0.01_ticks_data.csv"
+    metadata: "https://raw.githubusercontent.com/ilyamk/uniswap-v3-lp-strategy-toolkit/main/wsteth_eth_data_0.01_metadata.json"
+
+lp_simulation:
+  initial_capital_usd: 10000.0
+  # Các độ rộng vùng thanh khoản tương đối quanh giá mở vị thế P0: [P0*(1-w), P0*(1+w)]
+  range_widths_pct:
+    - 0.01   # ±1% (Ultra narrow - phù hợp correlated/stable pool)
+    - 0.02   # ±2% (Narrow)
+    - 0.05   # ±5% (Medium-narrow)
+    - 0.10   # ±10% (Standard concentrated)
+    - 0.20   # ±20% (Wide concentrated)
+    - 0.50   # ±50% (Very wide / quasi V2)
+  # Tham số chi phí giao dịch & gas (Mục 2.4 DATASET_PLAN.md)
+  gas_price_gwei: 20.0
+  rebalance_gas_units: 215000     # Burn + Collect + Swap + Mint trên Uniswap v3
+  swap_slippage_bps: 5.0          # 5 bps (0.05%) slippage khi swap cân bằng lại tỷ lệ token
+
+modeling:
+  # Các chân trời dự báo (Horizons) tính theo ngày và quy đổi ra giờ (Mục 1 RQ2 PROJECT_CONTEXT.md)
+  horizons_days: [1, 7, 30]
+  horizons_hours:
+    "1d": 24
+    "7d": 168
+    "30d": 720
+  quantiles: [0.50, 0.90, 0.95]
+  # Ngưỡng cảnh báo rủi ro IL vượt mức (dùng cho bài toán dự báo xác suất vượt ngưỡng)
+  il_exceedance_thresholds:
+    volatile_pool: 0.02     # |IL| > 2% cho pool biến động (WETH/USDC)
+    correlated_pool: 0.002  # |IL| > 0.2% cho pool tương quan/stable (wstETH/ETH, USDC/USDT)
+  # Tỷ lệ chia dữ liệu theo trục thời gian & số fold Walk-Forward Expanding Window (Mục P2)
+  split_ratios:
+    train: 0.60
+    valid: 0.20
+    test: 0.20
+  walk_forward_folds: 8
+  walk_forward_min_train_ratio: 0.40
+  # Phân loại chế độ thị trường (Market Regime) theo phân vị của Realized Volatility 24h trên tập Train
+  regime_quantiles:
+    low_vol_upper: 0.33
+    high_vol_lower: 0.67
+  xgboost_params:
+    n_estimators: 250
+    max_depth: 4
+    learning_rate: 0.05
+    subsample: 0.8
+    colsample_bytree: 0.8
+    random_state: 42
+
+backtest:
+  default_range_width_volatile: 0.10     # ±10% cho WETH/USDC
+  default_range_width_correlated: 0.02   # ±2% cho wstETH/ETH
+  periodic_rebalance_hours: 168          # Tái cân bằng định kỳ mỗi 7 ngày (168h)
+  signal_safety_margin_mult: 1.25        # Lợi ích kỳ vọng phải >= 1.25 * (Gas + Slippage) mới rebalance

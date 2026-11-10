@@ -1,0 +1,88 @@
+# Danh sách Pool Uniswap v3 Ethereum Mainnet đã xác thực trực tiếp qua The Graph Subgraph
+# Subgraph ID: 5zvR82QoaXYFyDEKLZ9t6v9adgnptxYpKpSbxtgVENFV
+pools:
+  wsteth_eth_001:
+    name: "wstETH/WETH 0.01%"
+    address: "0x109830a1aaad605bbf02a9dfa7b0b92ec2fb7daa"
+    category: "correlated"
+    enabled: true
+    fee_tier_bps: 100          # 100 = 0.01% (1 bps)
+    fee_rate: 0.0001
+    tick_spacing: 1
+    token0:
+      symbol: "wstETH"
+      address: "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0"
+      decimals: 18
+    token1:
+      symbol: "WETH"
+      address: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+      decimals: 18
+    # Với cặp tương quan wstETH/WETH, giá tham chiếu là token1Price (WETH per wstETH ~ 1.18-1.19),
+    # và biến động được tính trực tiếp từ chuỗi giá tỷ giá của pool; ETHUSDT dùng để quy đổi phí gas sang USD.
+    price_field: "token1Price"
+    cex_reference_symbol: "ETHUSDT"
+    use_cex_for_volatility: false
+    verified_source: "Uniswap v3 Mainnet Subgraph & ilyamk/uniswap-v3-lp-strategy-toolkit"
+
+  weth_usdc_005:
+    name: "USDC/WETH 0.05%"
+    address: "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640"
+    category: "volatile"
+    enabled: true
+    fee_tier_bps: 500          # 500 = 0.05% (5 bps)
+    fee_rate: 0.0005
+    tick_spacing: 10
+    token0:
+      symbol: "USDC"
+      address: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+      decimals: 6
+    token1:
+      symbol: "WETH"
+      address: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+      decimals: 18
+    price_field: "token0Price"
+    cex_reference_symbol: "ETHUSDT"
+    use_cex_for_volatility: true
+    verified_source: "Uniswap v3 Mainnet Subgraph (5zvR82QoaXYFyDEKLZ9t6v9adgnptxYpKpSbxtgVENFV)"
+
+  weth_usdc_030:
+    name: "USDC/WETH 0.30%"
+    address: "0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8"
+    category: "volatile"
+    enabled: true
+    fee_tier_bps: 3000         # 3000 = 0.30% (30 bps)
+    fee_rate: 0.0030
+    tick_spacing: 60
+    token0:
+      symbol: "USDC"
+      address: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+      decimals: 6
+    token1:
+      symbol: "WETH"
+      address: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+      decimals: 18
+    price_field: "token0Price"
+    cex_reference_symbol: "ETHUSDT"
+    use_cex_for_volatility: true
+    verified_source: "Uniswap v3 Mainnet Subgraph (5zvR82QoaXYFyDEKLZ9t6v9adgnptxYpKpSbxtgVENFV)"
+
+  usdc_usdt_001:
+    name: "USDC/USDT 0.01%"
+    address: "0x3416cf6c708da44db2624d63ea0aaef7113527c6"
+    category: "stable"
+    enabled: true
+    fee_tier_bps: 100          # 100 = 0.01% (1 bps)
+    fee_rate: 0.0001
+    tick_spacing: 1
+    token0:
+      symbol: "USDC"
+      address: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+      decimals: 6
+    token1:
+      symbol: "USDT"
+      address: "0xdac17f958d2ee523a2206206994597c13d831ec7"
+      decimals: 6
+    price_field: "token0Price"
+    cex_reference_symbol: "USDCUSDT"
+    use_cex_for_volatility: false
+    verified_source: "Uniswap v3 Mainnet Subgraph (5zvR82QoaXYFyDEKLZ9t6v9adgnptxYpKpSbxtgVENFV)"
