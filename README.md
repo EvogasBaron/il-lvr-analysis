@@ -72,7 +72,7 @@ Sao chép `.env.example` thành `.env`:
 ```powershell
 Copy-Item .env.example .env
 ```
-- Nếu bạn có khóa `THEGRAPH_API_KEY`, điền vào `.env` để truy vấn trực tiếp từ Uniswap v3 Mainnet Subgraph (`5zvR82QoaXYFyDEKLZ9t6v9adgnptxYpKpSbxtgVENFV`).
+- Nếu bạn có khóa `THEGRAPH_API_KEY`, điền vào `.env` để truy vấn trực tiếp từ Uniswap v3 Mainnet Subgraph.
 - Nếu để trống, pipeline tự động tải dữ liệu thực từ **Binance Vision** và dữ liệu mẫu xác thực từ `ilyamk/uniswap-v3-lp-strategy-toolkit` để chạy trọn vẹn 7 quy trình.
 
 ### Bước 3: Chạy toàn bộ 7 quy trình bằng một lệnh duy nhất
