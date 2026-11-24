@@ -8,7 +8,8 @@ __pycache__/
 *$py.class
 .pytest_cache/
 
-# Virtual environments
+# State & runner caches
+.git_push_state.json
 .venv/
 venv/
 env/
