@@ -1,0 +1,8 @@
+feature,mean_abs_shap,relative_share_pct
+feat_downside_vol_24h,0.0009080918,29.125961
+feat_fee_apr_24h,0.0007773639,24.93302
+feat_rvol_24h,0.0005683938,18.230553
+feat_amm_cex_spread_abs,0.00027339676,8.768875
+feat_flow_imbalance_24h,0.00022052012,7.07292
+feat_volume_tvl_ratio_24h,0.0001901453,6.098684
+feat_jump_intensity_24h,0.00017989706,5.769984
